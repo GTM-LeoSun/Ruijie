@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio</title>
+    <!-- Google tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DC243MX08Q"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+    
+      gtag('config', 'G-DC243MX08Q');
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
@@ -104,8 +113,8 @@
             </div>
 
             <div class="grid grid-cols-1 gap-4">
-                <!-- Button 1: Ruijie Model Mapping -->
-                <a href="https://ruijie.feishu.cn/share/base/query/shrcn3BWnQXZkjahWDGagTpveyc" 
+                <!-- Button 1: Ruijie Model Mapping (已添加追踪ID) -->
+                <a id="btn-model-mapping" href="https://ruijie.feishu.cn/share/base/query/shrcn3BWnQXZkjahWDGagTpveyc" 
                    class="flex items-center justify-between bg-brand p-5 rounded-2xl text-white active-scale transition-all btn-shadow">
                     <div class="flex items-center space-x-3">
                         <svg class="w-6 h-6" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -122,8 +131,8 @@
                     </svg>
                 </a>
 
-                <!-- Button 2: Scenario-based Solutions -->
-                <a href="https://gtm-leosun.github.io/Ruijie-Solution-Expert/index.html" 
+                <!-- Button 2: Scenario-based Solutions (已添加追踪ID) -->
+                <a id="btn-scenario-solutions" href="https://gtm-leosun.github.io/Ruijie-Solution-Expert/index.html" 
                    class="flex items-center justify-between bg-brand p-5 rounded-2xl text-white active-scale transition-all btn-shadow">
                     <div class="flex items-center space-x-3">
                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -162,6 +171,33 @@
     <footer class="p-6 text-center text-gray-400 text-sm">
         © 2026 Ruijie LATAM. All rights reserved.
     </footer>
+
+    <!-- Google Analytics 点击追踪事件监听脚本 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 追踪 "Consulta de Mapeo de Modelos Ruijie" 按钮点击
+            var btnModelMapping = document.getElementById('btn-model-mapping');
+            if (btnModelMapping) {
+                btnModelMapping.addEventListener('click', function() {
+                    gtag('event', 'click_model_mapping', {
+                        'event_category': 'Sales Tools',
+                        'event_label': 'Ruijie Model Mapping'
+                    });
+                });
+            }
+
+            // 追踪 "Proporcionas el escenario. Proporciono la lista BOM." 按钮点击
+            var btnScenarioSolutions = document.getElementById('btn-scenario-solutions');
+            if (btnScenarioSolutions) {
+                btnScenarioSolutions.addEventListener('click', function() {
+                    gtag('event', 'click_scenario_solutions', {
+                        'event_category': 'Sales Tools',
+                        'event_label': 'Scenario-based Solutions'
+                    });
+                });
+            }
+        });
+    </script>
 
 </body>
 </html>
