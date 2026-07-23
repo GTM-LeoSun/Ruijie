@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio</title>
+    <!-- 提前完成飞书域名的 DNS 查询和 HTTPS 连接 -->
+    <link rel="dns-prefetch" href="//ruijie.feishu.cn">
+    <link rel="preconnect" href="https://ruijie.feishu.cn" crossorigin>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-DC243MX08Q"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -96,6 +99,39 @@
         </div>
     </main>
     <footer class="px-6 pb-8 pt-4 text-center text-gray-400 text-xs">© 2026 Ruijie LATAM · All rights reserved.</footer>
+    <!-- 页面显示完成后，在后台预加载第一个销售工具 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var firstToolUrl = 'https://ruijie.feishu.cn/share/base/query/shrcn3BWnQXZkjahWDGagTpveyc';
+
+            function preloadFirstTool() {
+                if (document.getElementById('preload-first-tool')) {
+                    return;
+                }
+
+                var iframe = document.createElement('iframe');
+                iframe.id = 'preload-first-tool';
+                iframe.src = firstToolUrl;
+                iframe.title = 'Preload sales tool';
+                iframe.setAttribute('aria-hidden', 'true');
+                iframe.setAttribute('tabindex', '-1');
+                iframe.style.position = 'fixed';
+                iframe.style.width = '1px';
+                iframe.style.height = '1px';
+                iframe.style.opacity = '0';
+                iframe.style.pointerEvents = 'none';
+                iframe.style.left = '-9999px';
+                iframe.style.border = '0';
+                document.body.appendChild(iframe);
+            }
+
+            if ('requestIdleCallback' in window) {
+                window.requestIdleCallback(preloadFirstTool, { timeout: 2000 });
+            } else {
+                window.setTimeout(preloadFirstTool, 1500);
+            }
+        });
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var btnModelMapping = document.getElementById('btn-model-mapping');
