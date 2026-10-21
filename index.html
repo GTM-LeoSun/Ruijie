@@ -39,6 +39,70 @@
             background: rgba(255, 255, 255, 0.16);
             box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
         }
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: rgba(3, 25, 61, 0.72);
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 180ms ease, visibility 180ms ease;
+        }
+        .loading-overlay.is-visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .loading-panel {
+            width: 100%;
+            max-width: 360px;
+            padding: 30px 26px 26px;
+            border-radius: 24px;
+            background: #fff;
+            box-shadow: 0 24px 64px rgba(0, 26, 70, 0.28);
+            text-align: center;
+            transform: translateY(10px) scale(0.98);
+            transition: transform 180ms ease;
+        }
+        .loading-overlay.is-visible .loading-panel {
+            transform: translateY(0) scale(1);
+        }
+        .loading-spinner {
+            width: 54px;
+            height: 54px;
+            margin: 0 auto 20px;
+            border: 5px solid #dce9fb;
+            border-top-color: var(--brand-color);
+            border-radius: 50%;
+            animation: spin 0.85s linear infinite;
+        }
+        .loading-progress {
+            height: 6px;
+            margin-top: 22px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #e8eef7;
+        }
+        .loading-progress-bar {
+            width: 0;
+            height: 100%;
+            border-radius: inherit;
+            background: var(--brand-color);
+        }
+        .loading-overlay.is-visible .loading-progress-bar {
+            animation: estimated-progress 3s linear forwards;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes estimated-progress { from { width: 8%; } to { width: 100%; } }
+        @media (prefers-reduced-motion: reduce) {
+            .loading-overlay, .loading-panel { transition: none; }
+            .loading-spinner { animation-duration: 1.8s; }
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -68,7 +132,10 @@
                             <path d="M70 35L82 47L94 35" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                         </span>
-                        <span class="font-semibold leading-snug">Consulta de Mapeo de Modelos Ruijie</span>
+                        <span class="min-w-0 leading-snug">
+                            <span class="block font-semibold">Consulta de Mapeo de Modelos Ruijie</span>
+                            <span class="block mt-1 text-xs font-medium text-blue-100">La primera carga puede tardar unos 10 segundos</span>
+                        </span>
                     </div>
                     <svg class="w-5 h-5 ml-3 flex-shrink-0 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="9 5l7 7-7 7"></path>
@@ -98,6 +165,22 @@
             </div>
         </div>
     </main>
+    <div id="loading-overlay" class="loading-overlay" role="status" aria-live="polite" aria-hidden="true">
+        <div class="loading-panel">
+            <div class="loading-spinner" aria-hidden="true"></div>
+            <h2 class="text-xl font-bold text-gray-900">Conectando con la herramienta…</h2>
+            <p class="mt-2 text-sm leading-relaxed text-gray-500">
+                La primera carga desde tu ubicación puede tardar hasta 10 segundos.
+            </p>
+            <p class="mt-4 text-sm font-semibold text-brand">
+                Abriendo en <span id="loading-countdown">3</span> s
+            </p>
+            <div class="loading-progress" aria-hidden="true">
+                <div class="loading-progress-bar"></div>
+            </div>
+            <p class="mt-4 text-xs text-gray-400">Por favor, no cierres esta ventana.</p>
+        </div>
+    </div>
     <footer class="px-6 pb-8 pt-4 text-center text-gray-400 text-xs">© 2026 Ruijie LATAM · All rights reserved.</footer>
     <!-- 页面显示完成后，在后台预加载第一个销售工具 -->
     <script>
@@ -136,11 +219,34 @@
         document.addEventListener('DOMContentLoaded', function() {
             var btnModelMapping = document.getElementById('btn-model-mapping');
             if (btnModelMapping) {
-                btnModelMapping.addEventListener('click', function() {
+                btnModelMapping.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    var destination = btnModelMapping.href;
+                    var overlay = document.getElementById('loading-overlay');
+                    var countdown = document.getElementById('loading-countdown');
+                    var secondsRemaining = 3;
+
+                    overlay.classList.add('is-visible');
+                    overlay.setAttribute('aria-hidden', 'false');
+                    document.body.style.overflow = 'hidden';
+
+                    var countdownTimer = window.setInterval(function() {
+                        if (secondsRemaining > 1) {
+                            secondsRemaining -= 1;
+                            countdown.textContent = secondsRemaining;
+                        } else {
+                            window.clearInterval(countdownTimer);
+                            countdown.textContent = '0';
+                            window.location.assign(destination);
+                        }
+                    }, 1000);
+
                     gtag('event', 'click_model_mapping', {
                         'event_category': 'Sales Tools',
                         'event_label': 'Ruijie Model Mapping'
                     });
+
+                    // 倒计时期间隐藏预加载继续运行，既提供反馈，也争取更多缓存时间。
                 });
             }
             var btnScenarioSolutions = document.getElementById('btn-scenario-solutions');
